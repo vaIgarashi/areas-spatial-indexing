@@ -2,6 +2,9 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
 
+    group = 'ru.vagola'
+    version = '1.0-SNAPSHOT'
+
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -11,6 +14,7 @@ subprojects {
     }
 
     dependencies {
+        compile 'com.google.guava:guava:28.1-jre'
         testImplementation 'junit:junit:4.12'
     }
 }
