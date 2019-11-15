@@ -21,19 +21,24 @@ public class PointTest {
         Point point2 = new Point(150, 300);
         Point point3 = new Point(-50, -150);
         Point point4 = new Point(150, 300);
+        Point point5 = new Point(-150, -300);
 
         Point distance1 = point2.distance(point1);
         Point distance2 = point4.distance(point3);
+        Point distance3 = point5.distance(point3);
 
         assertEquals(50, distance1.getX());
         assertEquals(75, distance1.getY());
 
         assertEquals(100, distance2.getX());
         assertEquals(225, distance2.getY());
+
+        assertEquals(-50, distance3.getX());
+        assertEquals(-75, distance3.getY());
     }
 
     @Test
-    public void testCentral() {
+    public void testCenter() {
         Point point1 = new Point(0, -50);
         Point point2 = new Point(50, 50);
 
@@ -41,11 +46,6 @@ public class PointTest {
 
         assertEquals(25, center.getX());
         assertEquals(0, center.getY());
-    }
-
-    @Test
-    public void testOffset() {
-
     }
 
 }

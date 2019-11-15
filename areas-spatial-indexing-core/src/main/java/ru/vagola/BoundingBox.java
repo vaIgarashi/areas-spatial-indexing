@@ -18,6 +18,8 @@ public class BoundingBox {
         this.maxPoint = maxPoint;
         this.distance = maxPoint.distance(minPoint);
         this.centralPoint = maxPoint.center(minPoint);
+
+        checkArgument(distance.getX() != 0 && distance.getY() != 0, "Bounding box side must be greater than zero");
     }
 
     public static BoundingBox fromPoints(List<Point> points) {
@@ -76,17 +78,15 @@ public class BoundingBox {
     }
 
     private BoundingBox splitQuadrant(Quadrant quadrant) {
-        Point offset = maxPoint.offset(minPoint);;
-
         switch (quadrant) {
             case SOUTH_WEST:
-                return new BoundingBox(minPoint, offset);
+                return new BoundingBox(minPoint, centralPoint);
             case SOUTH_EAST:
-                return new BoundingBox(new Point(offset.getX(), minPoint.getY()), new Point(maxPoint.getX(), offset.getY()));
+                return new BoundingBox(new Point(centralPoint.getX(), minPoint.getY()), new Point(maxPoint.getX(), centralPoint.getY()));
             case NORTH_WEST:
-                return new BoundingBox(new Point(minPoint.getX(), offset.getX()), new Point(offset.getX(), maxPoint.getY()));
+                return new BoundingBox(new Point(minPoint.getX(), centralPoint.getY()), new Point(centralPoint.getX(), maxPoint.getY()));
             case NORTH_EAST:
-                return new BoundingBox(offset, maxPoint);
+                return new BoundingBox(centralPoint, maxPoint);
             default:
                 throw new UnsupportedOperationException();
         }

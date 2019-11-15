@@ -26,10 +26,6 @@ public class Point {
         return new Point((x - other.x) / 2, (y - other.y) / 2);
     }
 
-    public Point offset(Point other) {
-        return new Point(other.x + ((x - other.x) / 2), other.y + ((y - other.y) / 2));
-    }
-
     public Point center(Point other) {
         return new Point((x + other.x) / 2, (y + other.y) / 2);
     }
