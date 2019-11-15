@@ -2,15 +2,15 @@ package ru.vagola;
 
 public class Area {
 
-    private final int id;
+    private final short id;
     private final BoundingBox boundingBox;
 
-    public Area(int id, BoundingBox boundingBox) {
+    public Area(short id, BoundingBox boundingBox) {
         this.id = id;
         this.boundingBox = boundingBox;
     }
 
-    public int getId() {
+    public short getId() {
         return id;
     }
 
