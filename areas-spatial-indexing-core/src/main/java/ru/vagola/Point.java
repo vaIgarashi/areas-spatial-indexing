@@ -23,7 +23,7 @@ public class Point {
     }
 
     public Point distance(Point other) {
-        return new Point((x - other.x) / 2, (y - other.y) / 2);
+        return new Point((Math.abs(x - other.x)) / 2, (Math.abs(y - other.y)) / 2);
     }
 
     public Point center(Point other) {

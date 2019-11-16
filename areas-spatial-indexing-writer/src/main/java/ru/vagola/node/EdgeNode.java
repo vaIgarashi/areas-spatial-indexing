@@ -3,7 +3,6 @@ package ru.vagola.node;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import ru.vagola.Area;
-import ru.vagola.BoundingBox;
 import ru.vagola.Quadrant;
 
 import java.io.DataOutput;
@@ -14,26 +13,22 @@ import java.util.Map.Entry;
 public class EdgeNode implements QuadTreeNode {
 
     private final Map<Quadrant, QuadTreeNode> children;
-    private final BoundingBox boundingBox;
 
-    EdgeNode(Map<Quadrant, QuadTreeNode> children, BoundingBox boundingBox) {
+    EdgeNode(Map<Quadrant, QuadTreeNode> children) {
         this.children = children;
-        this.boundingBox = boundingBox;
     }
 
     @Override
     public QuadTreeNode putArea(Area area) {
         for (Entry<Quadrant, QuadTreeNode> entry : children.entrySet()) {
             Quadrant quadrant = entry.getKey();
-            QuadTreeNode node = entry.getValue();
+            QuadTreeNode childNode = entry.getValue();
 
-            if (boundingBox.containsBoundingBox(area.getBoundingBox())) {
-                // Area may overlap several nodes.
-                QuadTreeNode newNode = node.putArea(area);
+            // Area may overlap several nodes.
+            QuadTreeNode newNode = childNode.putArea(area);
 
-                if (node != newNode) {
-                    children.put(quadrant, newNode);
-                }
+            if (childNode != newNode) {
+                children.put(quadrant, newNode);
             }
         }
 
@@ -48,26 +43,35 @@ public class EdgeNode implements QuadTreeNode {
 
         for (Entry<Quadrant, QuadTreeNode> entry : children.entrySet()) {
             Quadrant quadrant = entry.getKey();
-            QuadTreeNode child = entry.getValue();
+            QuadTreeNode childNode = entry.getValue();
 
-            switch (quadrant) {
-                case SOUTH_WEST:
-                    nodeInfo |= 0x02;
-                    break;
-                case SOUTH_EAST:
-                    nodeInfo |= 0x04;
-                    break;
-                case NORTH_WEST:
-                    nodeInfo |= 0x08;
-                    break;
-                case NORTH_EAST:
-                    nodeInfo |= 0x16;
-                    break;
-                default:
-                    throw new UnsupportedOperationException();
+            ByteArrayDataOutput childrenOutput = ByteStreams.newDataOutput();
+            childNode.writeToBinary(childrenOutput);
+
+            byte[] outputByteArray = childrenOutput.toByteArray();
+
+            // We write child data only if it have more than just node info.
+            if (outputByteArray.length > 1) {
+                switch (quadrant) {
+                    case SOUTH_WEST:
+                        nodeInfo |= 0x02;
+                        break;
+                    case SOUTH_EAST:
+                        nodeInfo |= 0x04;
+                        break;
+                    case NORTH_WEST:
+                        nodeInfo |= 0x08;
+                        break;
+                    case NORTH_EAST:
+                        nodeInfo |= 0x16;
+                        break;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+
+                childrenBytes[quadrant.ordinal()] = outputByteArray;
+                output.writeByte(outputByteArray.length);
             }
-
-            writeChildNode(output, childrenBytes, quadrant, child);
         }
 
         output.writeByte(nodeInfo);
@@ -75,15 +79,6 @@ public class EdgeNode implements QuadTreeNode {
         for (byte[] childBytes : childrenBytes) {
             output.write(childBytes);
         }
-    }
-
-    private void writeChildNode(DataOutput output, byte[][] childrenBytes, Quadrant quadrant, QuadTreeNode child) throws IOException {
-        ByteArrayDataOutput childrenOutput = ByteStreams.newDataOutput();
-        child.writeToBinary(childrenOutput);
-
-        byte[] outputByteArray = childrenOutput.toByteArray();
-        childrenBytes[quadrant.ordinal()] = outputByteArray;
-        output.writeByte(outputByteArray.length);
     }
 
 }

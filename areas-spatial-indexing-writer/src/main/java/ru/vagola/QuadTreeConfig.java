@@ -20,6 +20,18 @@ public class QuadTreeConfig {
         this.minimalDistanceToSplit = minimalDistanceToSplit;
     }
 
+    public QuadTreeConfig setNodesToSplit(int nodesToSplit) {
+        return new QuadTreeConfig(nodesToSplit, this.maxLevel, this.minimalDistanceToSplit);
+    }
+
+    public QuadTreeConfig setMaxLevel(int maxLevel) {
+        return new QuadTreeConfig(this.nodesToSplit, maxLevel, this.minimalDistanceToSplit);
+    }
+
+    public QuadTreeConfig setMinimalDistanceToSplit(int minimalDistanceToSplit) {
+        return new QuadTreeConfig(this.nodesToSplit, this.maxLevel, minimalDistanceToSplit);
+    }
+
     public int getNodesToSplit() {
         return nodesToSplit;
     }

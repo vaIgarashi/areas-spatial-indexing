@@ -15,7 +15,7 @@ public class LeafNode implements QuadTreeNode {
     private final BoundingBox boundingBox;
     private final QuadTreeConfig config;
 
-    public LeafNode(BoundingBox boundingBox, QuadTreeConfig config) {
+    LeafNode(BoundingBox boundingBox, QuadTreeConfig config) {
         this(1, boundingBox, config);
     }
 
@@ -27,9 +27,13 @@ public class LeafNode implements QuadTreeNode {
 
     @Override
     public QuadTreeNode putArea(Area area) {
-        // In 1 byte header we can use only 7 bits for areas size.
-        if (areas.size() == 255) {
-            throw new IllegalStateException("Leaf node can't have more than 255 areas");
+        if (!boundingBox.containsBoundingBox(area.getBoundingBox())) {
+            return this;
+        }
+
+        // This limit comes from maximum binary node data length of 255 bytes.
+        if (areas.size() == 127) {
+            throw new IllegalStateException("Leaf node can't have more than 127 areas");
         }
 
         areas.put(area.getId(), area);
@@ -58,20 +62,18 @@ public class LeafNode implements QuadTreeNode {
         for (Area area : areas.values()) {
             for (Entry<Quadrant, QuadTreeNode> entry : children.entrySet()) {
                 Quadrant quadrant = entry.getKey();
-                QuadTreeNode node = entry.getValue();
 
-                if (boundingBox.containsBoundingBox(area.getBoundingBox())) {
-                    QuadTreeNode newNode = node.putArea(area);
+                QuadTreeNode childNode = entry.getValue();
+                QuadTreeNode newChildNode = childNode.putArea(area);
 
-                    // Children node may evolve to edge node in case all areas are placed in one quadrant.
-                    if (node != newNode) {
-                        children.put(quadrant, newNode);
-                    }
+                // Children node may evolve to edge node in case all areas are placed in one quadrant.
+                if (childNode != newChildNode) {
+                    children.put(quadrant, newChildNode);
                 }
             }
         }
 
-        return new EdgeNode(children, boundingBox);
+        return new EdgeNode(children);
     }
 
     @Override
