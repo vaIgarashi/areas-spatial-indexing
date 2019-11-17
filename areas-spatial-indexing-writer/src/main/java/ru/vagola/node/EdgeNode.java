@@ -3,10 +3,14 @@ package ru.vagola.node;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import ru.vagola.Area;
+import ru.vagola.BoundingBox;
+import ru.vagola.QuadTreeConfig;
 import ru.vagola.Quadrant;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,8 +18,18 @@ public class EdgeNode implements QuadTreeNode {
 
     private final Map<Quadrant, QuadTreeNode> children;
 
-    EdgeNode(Map<Quadrant, QuadTreeNode> children) {
+    EdgeNode(int level, BoundingBox boundingBox, QuadTreeConfig config) {
+        Map<Quadrant, QuadTreeNode> children = new EnumMap<>(Quadrant.class);
+
+        for (Entry<Quadrant, BoundingBox> entry : boundingBox.splitToQuadrants().entrySet()) {
+            children.put(entry.getKey(), new LeafNode(level, entry.getValue(), config));
+        }
+
         this.children = children;
+    }
+
+    public Map<Quadrant, QuadTreeNode> getChildren() {
+        return Collections.unmodifiableMap(children);
     }
 
     @Override
@@ -70,14 +84,21 @@ public class EdgeNode implements QuadTreeNode {
                 }
 
                 childrenBytes[quadrant.ordinal()] = outputByteArray;
-                output.writeByte(outputByteArray.length);
             }
         }
 
         output.writeByte(nodeInfo);
 
         for (byte[] childBytes : childrenBytes) {
-            output.write(childBytes);
+            if (childBytes != null) {
+                output.writeByte(childBytes.length);
+            }
+        }
+
+        for (byte[] childBytes : childrenBytes) {
+            if (childBytes != null) {
+                output.write(childBytes);
+            }
         }
     }
 

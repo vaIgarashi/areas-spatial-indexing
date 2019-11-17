@@ -1,12 +1,15 @@
 package ru.vagola.node;
 
-import ru.vagola.*;
+import ru.vagola.Area;
+import ru.vagola.BoundingBox;
+import ru.vagola.Point;
+import ru.vagola.QuadTreeConfig;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class LeafNode implements QuadTreeNode {
 
@@ -19,10 +22,14 @@ public class LeafNode implements QuadTreeNode {
         this(1, boundingBox, config);
     }
 
-    private LeafNode(int level, BoundingBox boundingBox, QuadTreeConfig config) {
+    LeafNode(int level, BoundingBox boundingBox, QuadTreeConfig config) {
         this.level = level;
         this.boundingBox = boundingBox;
         this.config = config;
+    }
+
+    public Map<Short, Area> getAreas() {
+        return Collections.unmodifiableMap(areas);
     }
 
     @Override
@@ -38,42 +45,24 @@ public class LeafNode implements QuadTreeNode {
 
         areas.put(area.getId(), area);
 
-        if (config.getMaxLevel() != level && config.getNodesToSplit() == areas.size()) {
+        if (config.getMaxLevel() != level && config.getAreasToSplit() == areas.size()) {
             Point distance = boundingBox.getDistance();
 
             int distanceX = distance.getX();
             int distanceY = distance.getY();
 
-            if (config.getMinimalDistanceToSplit() > distanceX && config.getMinimalDistanceToSplit() > distanceY) {
-                return evolveToEdgeNode();
+            if (distanceX > config.getMinimalDistanceToSplit() && distanceY > config.getMinimalDistanceToSplit()) {
+                EdgeNode edgeNode = new EdgeNode(level + 1, boundingBox, config);
+
+                for (Area other : areas.values()) {
+                    edgeNode.putArea(other);
+                }
+
+                return edgeNode;
             }
         }
 
         return this;
-    }
-
-    private QuadTreeNode evolveToEdgeNode() {
-        Map<Quadrant, QuadTreeNode> children = new HashMap<>();
-
-        for (Entry<Quadrant, BoundingBox> entry : boundingBox.splitToQuadrants().entrySet()) {
-            children.put(entry.getKey(), new LeafNode(level + 1, entry.getValue(), config));
-        }
-
-        for (Area area : areas.values()) {
-            for (Entry<Quadrant, QuadTreeNode> entry : children.entrySet()) {
-                Quadrant quadrant = entry.getKey();
-
-                QuadTreeNode childNode = entry.getValue();
-                QuadTreeNode newChildNode = childNode.putArea(area);
-
-                // Children node may evolve to edge node in case all areas are placed in one quadrant.
-                if (childNode != newChildNode) {
-                    children.put(quadrant, newChildNode);
-                }
-            }
-        }
-
-        return new EdgeNode(children);
     }
 
     @Override

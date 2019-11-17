@@ -39,6 +39,39 @@ public class RootNodeTest {
         assertEquals(25, input.readInt());
         assertEquals(225, input.readInt());
         assertEquals(75, input.readInt());
+        // No areas in leaf node.
+        assertEquals(0, input.readByte());
+    }
+
+    @Test
+    public void testWriteToBinaryWithEvolvedNode() throws IOException {
+        BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
+        RootNode rootNode = new RootNode(nodeBoundingBox, new QuadTreeConfig());
+
+        BoundingBox areaBoundingBox1 = new BoundingBox(new Point(-100, -100), new Point(-1, -1));
+        Area area1 = new Area((short) 1, areaBoundingBox1);
+        rootNode.putArea(area1);
+
+        BoundingBox areaBoundingBox2 = new BoundingBox(new Point(100, 100), new Point(1, 1));
+        Area area2 = new Area((short) 2, areaBoundingBox2);
+        rootNode.putArea(area2);
+
+        BoundingBox areaBoundingBox3 = new BoundingBox(new Point(-100, 100), new Point(-1, 1));
+        Area area3 = new Area((short) 3, areaBoundingBox3);
+        rootNode.putArea(area3);
+
+        BoundingBox areaBoundingBox4 = new BoundingBox(new Point(100, -100), new Point(1, -1));
+        Area area4 = new Area((short) 4, areaBoundingBox4);
+        rootNode.putArea(area4);
+
+        ByteArrayDataOutput output = ByteStreams.newDataOutput();
+        rootNode.writeToBinary(output);
+
+        ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
+        input.skipBytes(16);
+
+        // Edge node with all children have data.
+        assertEquals(31, input.readByte());
     }
 
 }
