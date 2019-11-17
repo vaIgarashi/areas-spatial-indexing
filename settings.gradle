@@ -1,4 +1,5 @@
 include 'areas-spatial-indexing-core'
 include 'areas-spatial-indexing-writer'
+include 'areas-spatial-indexing-reader'
 
 rootProject.name = 'areas-spatial-indexing'

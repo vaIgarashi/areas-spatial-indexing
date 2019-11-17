@@ -1,3 +1,4 @@
 dependencies {
     implementation project(':areas-spatial-indexing-core')
+    testImplementation project(':areas-spatial-indexing-reader')
 }
