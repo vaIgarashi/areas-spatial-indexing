@@ -9,8 +9,6 @@ import ru.vagola.BoundingBox;
 import ru.vagola.Point;
 import ru.vagola.QuadTreeConfig;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 
 public class RootNodeTest {
@@ -26,7 +24,7 @@ public class RootNodeTest {
     }
 
     @Test
-    public void testWriteToBinary() throws IOException {
+    public void testWriteToBinary() {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(-200, -50), new Point(250, 100));
         RootNode rootNode = new RootNode(nodeBoundingBox, new QuadTreeConfig());
 
@@ -35,16 +33,16 @@ public class RootNodeTest {
 
         ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
 
-        assertEquals(25, input.readInt());
-        assertEquals(25, input.readInt());
-        assertEquals(225, input.readInt());
-        assertEquals(75, input.readInt());
+        assertEquals(-200, input.readInt());
+        assertEquals(-50, input.readInt());
+        assertEquals(250, input.readInt());
+        assertEquals(100, input.readInt());
         // No areas in leaf node.
         assertEquals(0, input.readByte());
     }
 
     @Test
-    public void testWriteToBinaryWithEvolvedNode() throws IOException {
+    public void testWriteToBinaryWithEvolvedNode() {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
         RootNode rootNode = new RootNode(nodeBoundingBox, new QuadTreeConfig());
 

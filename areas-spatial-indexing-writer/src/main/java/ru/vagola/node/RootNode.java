@@ -1,12 +1,10 @@
 package ru.vagola.node;
 
+import com.google.common.io.ByteArrayDataOutput;
 import ru.vagola.Area;
 import ru.vagola.BoundingBox;
 import ru.vagola.Point;
 import ru.vagola.QuadTreeConfig;
-
-import java.io.DataOutput;
-import java.io.IOException;
 
 public class RootNode implements QuadTreeNode {
 
@@ -34,14 +32,14 @@ public class RootNode implements QuadTreeNode {
     }
 
     @Override
-    public void writeToBinary(DataOutput output) throws IOException {
-        Point centralPoint = boundingBox.getCentralPoint();
-        Point distance = boundingBox.getDistance();
+    public void writeToBinary(ByteArrayDataOutput output) {
+        Point minPoint = boundingBox.getMinPoint();
+        Point maxPoint = boundingBox.getMaxPoint();
 
-        output.writeInt(centralPoint.getX());
-        output.writeInt(centralPoint.getY());
-        output.writeInt(distance.getX());
-        output.writeInt(distance.getY());
+        output.writeInt(minPoint.getX());
+        output.writeInt(minPoint.getY());
+        output.writeInt(maxPoint.getX());
+        output.writeInt(maxPoint.getY());
 
         childNode.writeToBinary(output);
     }

@@ -1,6 +1,6 @@
 package ru.vagola;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +45,14 @@ public class BoundingBox {
         return new BoundingBox(minPoint, maxPoint);
     }
 
+    public Point getMinPoint() {
+        return minPoint;
+    }
+
+    public Point getMaxPoint() {
+        return maxPoint;
+    }
+
     public Point getDistance() {
         return distance;
     }
@@ -68,7 +76,7 @@ public class BoundingBox {
     }
 
     public Map<Quadrant, BoundingBox> splitToQuadrants() {
-        Map<Quadrant, BoundingBox> quadrants = new HashMap<>();
+        Map<Quadrant, BoundingBox> quadrants = new EnumMap<>(Quadrant.class);
 
         for (Quadrant quadrant : Quadrant.values()) {
             quadrants.put(quadrant, splitQuadrant(quadrant));
@@ -77,7 +85,7 @@ public class BoundingBox {
         return quadrants;
     }
 
-    private BoundingBox splitQuadrant(Quadrant quadrant) {
+    public BoundingBox splitQuadrant(Quadrant quadrant) {
         switch (quadrant) {
             case SOUTH_WEST:
                 return new BoundingBox(minPoint, centralPoint);
