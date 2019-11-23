@@ -1,4 +1,8 @@
-package ru.vagola;
+package ru.vagola.quadtree;
+
+import ru.vagola.BoundingBox;
+import ru.vagola.Point;
+import ru.vagola.Quadrant;
 
 import java.io.DataInput;
 import java.io.IOException;
