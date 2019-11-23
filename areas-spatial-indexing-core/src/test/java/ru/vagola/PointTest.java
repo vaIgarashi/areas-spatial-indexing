@@ -68,4 +68,12 @@ public class PointTest {
         assertEquals(0, center2.getY());
     }
 
+    @Test
+    public void testDetermineQuadrant() {
+        assertEquals(Quadrant.NORTH_WEST, new Point(-1, 1).determineQuadrant());
+        assertEquals(Quadrant.NORTH_EAST, new Point(1, 1).determineQuadrant());
+        assertEquals(Quadrant.SOUTH_WEST, new Point(-1, -1).determineQuadrant());
+        assertEquals(Quadrant.SOUTH_EAST, new Point(1, -1).determineQuadrant());
+    }
+
 }

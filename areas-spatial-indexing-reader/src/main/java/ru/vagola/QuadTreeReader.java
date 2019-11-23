@@ -59,7 +59,8 @@ public class QuadTreeReader {
     }
 
     private static Set<Short> moveTroughEdgeNode(ByteArrayDataInput input, byte nodeInfo, Point point, BoundingBox boundingBox) {
-        Quadrant quadrant = point.determineQuadrant(boundingBox.getCentralPoint());
+        Point diff = point.subtract(boundingBox.getCentralPoint());
+        Quadrant quadrant = diff.determineQuadrant();
         int currentOffset = 0;
 
         for (Quadrant other : Quadrant.values()) {

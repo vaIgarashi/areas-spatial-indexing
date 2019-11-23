@@ -30,18 +30,16 @@ public class Point {
         return new Point((x + other.x) / 2, (y + other.y) / 2);
     }
 
-    public Quadrant determineQuadrant(Point other) {
-        Point diff = this.subtract(other);
-
-        if (diff.getX() >= 0 && diff.getY() >= 0) {
+    public Quadrant determineQuadrant() {
+        if (x >= 0 && y >= 0) {
             return Quadrant.NORTH_EAST;
         }
 
-        if (diff.getX() <= 0 && diff.getY() <= 0) {
+        if (x <= 0 && y <= 0) {
             return Quadrant.SOUTH_WEST;
         }
 
-        if (diff.getX() <= 0 && diff.getY() >= 0) {
+        if (x <= 0 && y >= 0) {
             return Quadrant.NORTH_WEST;
         }
 
