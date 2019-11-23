@@ -1,16 +1,14 @@
 package ru.vagola;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
-
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class QuadTreeReader {
 
-    public static Set<Short> searchPossibleAreas(Point point, byte[] data) {
-        ByteArrayDataInput input = ByteStreams.newDataInput(data);
+    public static Set<Short> searchPossibleAreas(Point point, DataInput input) throws IOException {
         BoundingBox boundingBox = readBoundingBox(input);
 
         if (!boundingBox.containsPoint(point)) {
@@ -20,7 +18,7 @@ public class QuadTreeReader {
         return searchAreasInNode(input, point, boundingBox);
     }
 
-    private static BoundingBox readBoundingBox(ByteArrayDataInput input) {
+    private static BoundingBox readBoundingBox(DataInput input) throws IOException {
         int centralPointX = input.readInt();
         int centralPointY = input.readInt();
 
@@ -33,7 +31,7 @@ public class QuadTreeReader {
         return new BoundingBox(minPoint, maxPoint);
     }
 
-    private static Set<Short> searchAreasInNode(ByteArrayDataInput input, Point point, BoundingBox boundingBox) {
+    private static Set<Short> searchAreasInNode(DataInput input, Point point, BoundingBox boundingBox) throws IOException {
         byte nodeInfo = input.readByte();
         int nodeType = nodeInfo & 0x01;
 
@@ -47,7 +45,7 @@ public class QuadTreeReader {
         }
     }
 
-    private static Set<Short> searchAreasInDataNode(ByteArrayDataInput input, byte nodeInfo) {
+    private static Set<Short> searchAreasInDataNode(DataInput input, byte nodeInfo) throws IOException {
         Set<Short> possibleAreas = new HashSet<>();
         int areasAmount = nodeInfo >> 1;
 
@@ -58,7 +56,7 @@ public class QuadTreeReader {
         return possibleAreas;
     }
 
-    private static Set<Short> moveTroughEdgeNode(ByteArrayDataInput input, byte nodeInfo, Point point, BoundingBox boundingBox) {
+    private static Set<Short> moveTroughEdgeNode(DataInput input, byte nodeInfo, Point point, BoundingBox boundingBox) throws IOException {
         Point diff = point.subtract(boundingBox.getCentralPoint());
         Quadrant quadrant = diff.determineQuadrant();
         int currentOffset = 0;
