@@ -6,6 +6,7 @@ import com.google.common.io.ByteStreams;
 import org.junit.Test;
 import ru.vagola.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -63,7 +64,7 @@ public class EdgeNodeTest {
     }
 
     @Test
-    public void testWriteToBinary() {
+    public void testWriteToBinary() throws IOException {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
         EdgeNode edgeNode = new EdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
 

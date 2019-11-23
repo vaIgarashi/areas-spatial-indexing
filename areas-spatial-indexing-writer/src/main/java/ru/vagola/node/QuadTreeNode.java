@@ -1,12 +1,14 @@
 package ru.vagola.node;
 
-import com.google.common.io.ByteArrayDataOutput;
 import ru.vagola.Area;
+
+import java.io.DataOutput;
+import java.io.IOException;
 
 public interface QuadTreeNode {
 
     QuadTreeNode putArea(Area area);
 
-    void writeToBinary(ByteArrayDataOutput output);
+    void writeToBinary(DataOutput output) throws IOException;
 
 }

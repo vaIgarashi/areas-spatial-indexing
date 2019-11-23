@@ -7,6 +7,8 @@ import ru.vagola.BoundingBox;
 import ru.vagola.QuadTreeConfig;
 import ru.vagola.Quadrant;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
@@ -48,7 +50,7 @@ public class EdgeNode implements QuadTreeNode {
     }
 
     @Override
-    public void writeToBinary(ByteArrayDataOutput output) {
+    public void writeToBinary(DataOutput output) throws IOException {
         byte[][] childrenBytes = new byte[Quadrant.values().length][];
         // Lowest bit used as edge node type.
         byte nodeInfo = 1;

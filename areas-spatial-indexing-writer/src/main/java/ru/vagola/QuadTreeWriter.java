@@ -1,25 +1,30 @@
 package ru.vagola;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import ru.vagola.node.QuadTreeNode;
 import ru.vagola.node.RootNode;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Set;
 
 public class QuadTreeWriter {
 
-    public static byte[] createBinaryIndex(BoundingBox boundingBox, Set<Area> areas, QuadTreeConfig config) {
+    private final BoundingBox boundingBox;
+    private final QuadTreeConfig config;
+
+    public QuadTreeWriter(BoundingBox boundingBox, QuadTreeConfig config) {
+        this.boundingBox = boundingBox;
+        this.config = config;
+    }
+
+    public void writeAreas(DataOutput output, Set<Area> areas) throws IOException {
         QuadTreeNode rootNode = new RootNode(boundingBox, config);
 
         for (Area area : areas) {
             rootNode.putArea(area);
         }
 
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
         rootNode.writeToBinary(output);
-
-        return output.toByteArray();
     }
 
 }

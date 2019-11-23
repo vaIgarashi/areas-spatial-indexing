@@ -9,6 +9,8 @@ import ru.vagola.BoundingBox;
 import ru.vagola.Point;
 import ru.vagola.QuadTreeConfig;
 
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 public class LeafNodeTest {
@@ -89,7 +91,7 @@ public class LeafNodeTest {
     }
 
     @Test
-    public void testWriteToBinary() {
+    public void testWriteToBinary() throws IOException {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(0, 0), new Point(100, 100));
         LeafNode leafNode = new LeafNode(nodeBoundingBox, new QuadTreeConfig());
 

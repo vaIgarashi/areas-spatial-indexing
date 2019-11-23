@@ -1,11 +1,12 @@
 package ru.vagola.node;
 
-import com.google.common.io.ByteArrayDataOutput;
 import ru.vagola.Area;
 import ru.vagola.BoundingBox;
 import ru.vagola.Point;
 import ru.vagola.QuadTreeConfig;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class LeafNode implements QuadTreeNode {
     }
 
     @Override
-    public void writeToBinary(ByteArrayDataOutput output) {
+    public void writeToBinary(DataOutput output) throws IOException {
         // Lowest bit used as leaf node type.
         output.writeByte((areas.size() & 0x7F) << 1);
 
