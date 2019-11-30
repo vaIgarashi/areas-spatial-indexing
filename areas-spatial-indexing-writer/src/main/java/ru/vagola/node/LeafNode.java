@@ -52,7 +52,7 @@ public class LeafNode implements QuadTreeNode {
             int distanceY = distance.getY();
 
             if (distanceX > config.getMinimalDistanceToSplit() && distanceY > config.getMinimalDistanceToSplit()) {
-                EdgeNode edgeNode = new EdgeNode(level + 1, boundingBox, config);
+                EdgeNode edgeNode = EdgeNode.createEdgeNode(level + 1, boundingBox, config);
 
                 for (Area other : areas.values()) {
                     edgeNode.putArea(other);
@@ -75,4 +75,24 @@ public class LeafNode implements QuadTreeNode {
         }
     }
 
+    @Override
+    public boolean isEmpty() {
+        return areas.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+        for (short areaId : areas.keySet()) {
+            for(int indent = 0; indent < level * 2; indent++) {
+                output.append(" ");
+            }
+
+            output.append("- ");
+            output.append(areaId);
+            output.append("\n");
+        }
+
+        return output.toString();
+    }
 }

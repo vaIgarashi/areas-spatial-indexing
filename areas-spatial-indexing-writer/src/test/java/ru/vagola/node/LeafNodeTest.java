@@ -107,6 +107,7 @@ public class LeafNodeTest {
 
         ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
 
+        assertEquals(255, output.toByteArray().length);
         assertEquals(254, input.readUnsignedByte());
 
         for (short i = 0; i < 127; i++) {

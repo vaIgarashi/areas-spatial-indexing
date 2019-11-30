@@ -46,4 +46,9 @@ public class Point {
         return Quadrant.SOUTH_EAST;
     }
 
+    @Override
+    public String toString() {
+        return "x: " + x + ", y: " + y;
+    }
+
 }

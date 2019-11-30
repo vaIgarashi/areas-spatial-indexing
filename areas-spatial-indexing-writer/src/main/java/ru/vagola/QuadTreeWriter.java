@@ -9,22 +9,28 @@ import java.util.Set;
 
 public class QuadTreeWriter {
 
-    private final BoundingBox boundingBox;
-    private final QuadTreeConfig config;
+    private final QuadTreeNode rootNode;
 
-    public QuadTreeWriter(BoundingBox boundingBox, QuadTreeConfig config) {
-        this.boundingBox = boundingBox;
-        this.config = config;
+    private QuadTreeWriter(QuadTreeNode rootNode) {
+        this.rootNode = rootNode;
     }
 
-    public void writeAreas(DataOutput output, Set<Area> areas) throws IOException {
+    public static QuadTreeWriter createWriter(BoundingBox boundingBox, QuadTreeConfig config, Set<Area> areas) {
         QuadTreeNode rootNode = new RootNode(boundingBox, config);
 
         for (Area area : areas) {
             rootNode.putArea(area);
         }
 
+        return new QuadTreeWriter(rootNode);
+    }
+
+    public void writeAreas(DataOutput output) throws IOException {
         rootNode.writeToBinary(output);
+    }
+
+    public String toString() {
+        return rootNode.toString().trim();
     }
 
 }

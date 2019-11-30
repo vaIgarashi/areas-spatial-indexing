@@ -23,14 +23,14 @@ public class QuadTreeReader {
     }
 
     private static BoundingBox readBoundingBox(DataInput input) throws IOException {
-        int centralPointX = input.readInt();
-        int centralPointY = input.readInt();
+        int minPointX = input.readInt();
+        int minPointY = input.readInt();
 
-        int distanceX = input.readInt();
-        int distanceY = input.readInt();
+        int maxPointX = input.readInt();
+        int maxPointY = input.readInt();
 
-        Point minPoint = new Point(centralPointX - distanceX, centralPointY - distanceY);
-        Point maxPoint = new Point(centralPointX + distanceX, centralPointY + distanceY);
+        Point minPoint = new Point(minPointX, minPointY);
+        Point maxPoint = new Point(maxPointX, maxPointY);
 
         return new BoundingBox(minPoint, maxPoint);
     }
@@ -41,7 +41,7 @@ public class QuadTreeReader {
 
         switch (nodeType) {
             case 0:
-                return searchAreasInDataNode(input, nodeInfo);
+                return readAreasFromLeafNode(input, nodeInfo);
             case 1:
                 return moveTroughEdgeNode(input, nodeInfo, point, boundingBox);
             default:
@@ -49,7 +49,7 @@ public class QuadTreeReader {
         }
     }
 
-    private static Set<Short> searchAreasInDataNode(DataInput input, byte nodeInfo) throws IOException {
+    private static Set<Short> readAreasFromLeafNode(DataInput input, int nodeInfo) throws IOException {
         Set<Short> possibleAreas = new HashSet<>();
         int areasAmount = nodeInfo >> 1;
 
@@ -63,22 +63,23 @@ public class QuadTreeReader {
     private static Set<Short> moveTroughEdgeNode(DataInput input, byte nodeInfo, Point point, BoundingBox boundingBox) throws IOException {
         Point diff = point.subtract(boundingBox.getCentralPoint());
         Quadrant quadrant = diff.determineQuadrant();
-        int currentOffset = 0;
+        int offset = 0;
 
         for (Quadrant other : Quadrant.values()) {
-            int value = 2 << (quadrant.ordinal());
+            int value = 2 << (other.ordinal());
 
             if ((nodeInfo & value) == value) {
-                if (other == quadrant) {
-                    input.skipBytes(currentOffset);
-                    return searchAreasInNode(input, point, boundingBox.splitQuadrant(quadrant));
+                if (quadrant.ordinal() > other.ordinal()) {
+                    int length = input.readUnsignedByte();
+                    offset += length;
+                } else {
+                    offset += 1;
                 }
-
-                currentOffset += input.readUnsignedByte();
             }
         }
 
-        return Collections.emptySet();
+        input.skipBytes(offset);
+        return searchAreasInNode(input, point, boundingBox.splitQuadrant(quadrant));
     }
 
 }

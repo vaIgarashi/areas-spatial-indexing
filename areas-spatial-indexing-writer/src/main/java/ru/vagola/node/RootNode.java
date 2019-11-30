@@ -46,4 +46,14 @@ public class RootNode implements QuadTreeNode {
         childNode.writeToBinary(output);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return childNode.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return "QuadTree(1): " + "\n" + childNode.toString();
+    }
+
 }

@@ -17,7 +17,7 @@ public class EdgeNodeTest {
     @Test
     public void testPutArea() {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
-        EdgeNode edgeNode = new EdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
+        EdgeNode edgeNode = EdgeNode.createEdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
 
         BoundingBox areaBoundingBox1 = new BoundingBox(new Point(-100, -100), new Point(-1, -1));
         Area area1 = new Area((short) 1, areaBoundingBox1);
@@ -64,9 +64,9 @@ public class EdgeNodeTest {
     }
 
     @Test
-    public void testWriteToBinary() throws IOException {
+    public void testWriteToBinaryFullData() throws IOException {
         BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
-        EdgeNode edgeNode = new EdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
+        EdgeNode edgeNode = EdgeNode.createEdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
 
         BoundingBox areaBoundingBox1 = new BoundingBox(new Point(-100, -100), new Point(-1, -1));
         Area area1 = new Area((short) 1, areaBoundingBox1);
@@ -88,6 +88,7 @@ public class EdgeNodeTest {
         edgeNode.writeToBinary(output);
 
         ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
+        assertEquals(17, output.toByteArray().length);
         assertEquals(31, input.readByte());
 
         for (int i = 0; i < Quadrant.values().length; i++) {
@@ -105,6 +106,39 @@ public class EdgeNodeTest {
 
         assertEquals(2, input.readByte());
         assertEquals(4, input.readShort());
+    }
+
+    @Test
+    public void testWriteToBinaryNoData() throws IOException {
+        BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
+        EdgeNode edgeNode = EdgeNode.createEdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
+
+        ByteArrayDataOutput output = ByteStreams.newDataOutput();
+        edgeNode.writeToBinary(output);
+
+        ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
+        assertEquals(1, output.toByteArray().length);
+        assertEquals(1, input.readByte());
+    }
+
+    @Test
+    public void testWriteToBinaryPartialData() throws IOException {
+        BoundingBox nodeBoundingBox = new BoundingBox(new Point(-100, -100), new Point(100, 100));
+        EdgeNode edgeNode = EdgeNode.createEdgeNode(1, nodeBoundingBox, new QuadTreeConfig());
+
+        BoundingBox areaBoundingBox = new BoundingBox(new Point(-100, -100), new Point(-1, -1));
+        Area area = new Area((short) 1, areaBoundingBox);
+        edgeNode.putArea(area);
+
+        ByteArrayDataOutput output = ByteStreams.newDataOutput();
+        edgeNode.writeToBinary(output);
+
+        ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
+        assertEquals(5, output.toByteArray().length);
+        assertEquals(9, input.readByte()); // Edge node info.
+        assertEquals(3, input.readByte()); // Leaf node length.
+        assertEquals(2, input.readByte()); // Leaf node info.
+        assertEquals(1, input.readShort()); // Area id.
     }
 
 }

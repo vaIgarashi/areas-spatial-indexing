@@ -18,4 +18,8 @@ public class Area {
         return boundingBox;
     }
 
+    @Override
+    public String toString() {
+        return "id: " + id + ", boundingBox: " + boundingBox;
+    }
 }

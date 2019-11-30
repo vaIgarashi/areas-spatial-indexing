@@ -16,16 +16,22 @@ import java.util.Map.Entry;
 
 public class EdgeNode implements QuadTreeNode {
 
+    private final int level;
     private final Map<Quadrant, QuadTreeNode> children;
 
-    EdgeNode(int level, BoundingBox boundingBox, QuadTreeConfig config) {
+    private EdgeNode(int level, Map<Quadrant, QuadTreeNode> children) {
+        this.level = level;
+        this.children = children;
+    }
+
+    static EdgeNode createEdgeNode(int level, BoundingBox boundingBox, QuadTreeConfig config) {
         Map<Quadrant, QuadTreeNode> children = new EnumMap<>(Quadrant.class);
 
         for (Entry<Quadrant, BoundingBox> entry : boundingBox.splitToQuadrants().entrySet()) {
             children.put(entry.getKey(), new LeafNode(level, entry.getValue(), config));
         }
 
-        this.children = children;
+        return new EdgeNode(level, children);
     }
 
     public Map<Quadrant, QuadTreeNode> getChildren() {
@@ -59,15 +65,12 @@ public class EdgeNode implements QuadTreeNode {
             Quadrant quadrant = entry.getKey();
             QuadTreeNode childNode = entry.getValue();
 
-            ByteArrayDataOutput childrenOutput = ByteStreams.newDataOutput();
-            childNode.writeToBinary(childrenOutput);
-
-            byte[] outputByteArray = childrenOutput.toByteArray();
-
-            // We write child data only if it have more than just node info.
-            if (outputByteArray.length > 1) {
+            if (!childNode.isEmpty()) {
                 nodeInfo |= 2 << quadrant.ordinal();
-                childrenBytes[quadrant.ordinal()] = outputByteArray;
+
+                ByteArrayDataOutput childrenOutput = ByteStreams.newDataOutput();
+                childNode.writeToBinary(childrenOutput);
+                childrenBytes[quadrant.ordinal()] = childrenOutput.toByteArray();
             }
         }
 
@@ -84,6 +87,41 @@ public class EdgeNode implements QuadTreeNode {
                 output.write(childBytes);
             }
         }
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (QuadTreeNode node : children.values()) {
+            if (!node.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder output = new StringBuilder();
+
+        for (Entry<Quadrant, QuadTreeNode> entry : children.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                continue;
+            }
+
+            for(int indent = 0; indent < (level - 1) * 2; indent++) {
+                output.append(" ");
+            }
+
+            output.append(entry.getKey());
+            output.append("(");
+            output.append(level);
+            output.append("): \n");
+
+            output.append(entry.getValue());
+        }
+
+        return output.toString();
     }
 
 }

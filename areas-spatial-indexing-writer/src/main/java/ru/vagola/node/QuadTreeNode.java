@@ -11,4 +11,6 @@ public interface QuadTreeNode {
 
     void writeToBinary(DataOutput output) throws IOException;
 
+    boolean isEmpty();
+
 }

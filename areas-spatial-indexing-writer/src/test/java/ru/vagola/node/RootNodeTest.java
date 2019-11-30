@@ -35,6 +35,7 @@ public class RootNodeTest {
 
         ByteArrayDataInput input = ByteStreams.newDataInput(output.toByteArray());
 
+        assertEquals(17, output.toByteArray().length);
         assertEquals(-200, input.readInt());
         assertEquals(-50, input.readInt());
         assertEquals(250, input.readInt());

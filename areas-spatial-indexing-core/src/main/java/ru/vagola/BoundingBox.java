@@ -100,4 +100,9 @@ public class BoundingBox {
         }
     }
 
+    @Override
+    public String toString() {
+        return "min: " + minPoint + ", max: " + maxPoint;
+    }
+
 }
